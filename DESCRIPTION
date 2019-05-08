@@ -1,0 +1,37 @@
+Package: spectralGraphTopology
+Title: Learning Graphs from Data via Spectral Constraints
+Version: 0.1.0
+Description: Block coordinate descent estimators to learn k-component, bipartite,
+    and k-component bipartite graphs from data by imposing spectral constraints
+    on the eigenvalues and eigenvectors of the Laplacian and adjacency matrices.
+    Those estimators leverages spectral properties of the graphical models as a
+    prior information, which turn out to play key roles in unsupervised machine
+    learning tasks such as clustering and community detection.  This package is
+    based on the paper "A Unified Framework for Structured Graph Learning via
+    Spectral Constraints" by S. Kumar et al (2019) <arXiv:1904.09792>.
+Authors@R: c(
+  person("Ze", "Vinicius", role = c("cre", "aut"), email = "jvmirca@gmail.com"),
+  person(c("Daniel", "P."), "Palomar", role = "aut", email = "daniel.p.palomar@gmail.com")
+  )
+Maintainer: Ze Vinicius <jvmirca@gmail.com>
+URL: https://github.com/dppalomar/spectralGraphTopology,
+        https://mirca.github.io/spectralGraphTopology,
+        https://www.danielppalomar.com
+BugReports: https://github.com/dppalomar/spectralGraphTopology/issues
+Depends:
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+LinkingTo: Rcpp, RcppArmadillo, RcppEigen
+Imports: Rcpp, osqp, MASS, Matrix, progress, rlist
+RoxygenNote: 6.1.1
+Suggests: bookdown, knitr, prettydoc, rmarkdown, R.rsp, testthat,
+        patrick, corrplot, igraph, kernlab, pals, clusterSim, viridis,
+        quadprog, matrixcalc, CVXR
+VignetteBuilder: bookdown, knitr, prettydoc, rmarkdown, R.rsp
+NeedsCompilation: yes
+Packaged: 2019-05-04 11:46:48 UTC; jvmirca
+Author: Ze Vinicius [cre, aut],
+  Daniel P. Palomar [aut]
+Repository: CRAN
+Date/Publication: 2019-05-08 10:30:03 UTC
