@@ -16,14 +16,6 @@ w_init <- function(w0, Sinv, edge_tol = 0) {
 }
 
 
-#laplacian.w_update <- function(w, Lw, U, beta, lambda, K) {
-#  grad_f <- Lstar(Lw - crossprod(sqrt(lambda) * t(U)) + K / beta)
-#  w_update <- w - .5 * grad_f / nrow(Lw)
-#  w_update[w_update < 0] <- 0
-#  return(w_update)
-#}
-
-
 laplacian.w_update <- function(w, Lw, U, beta, lambda, K) {
   c <- Lstar(crossprod(sqrt(lambda) * t(U)) - K / beta)
   grad_f <- Lstar(Lw) - c
@@ -37,16 +29,6 @@ laplacian.w_update <- function(w, Lw, U, beta, lambda, K) {
   return(w_update)
 }
 
-
-#joint.w_update <- function(w, Lw, Aw, U, V, lambda, psi, beta, nu, K) {
-#  ULmdUT <- crossprod(sqrt(lambda) * t(U))
-#  VPsiVT <- V %*% diag(psi) %*% t(V)
-#  grad_f1 <- Lstar(beta * (Lw - ULmdUT) + K)
-#  grad_f2 <- nu * Astar(Aw - VPsiVT)
-#  w_update <- w - .5 * (grad_f1 + grad_f2) / (nrow(Lw) * beta + nu)
-#  w_update[w_update < 0] <- 0
-#  return(w_update)
-#}
 
 joint.w_update <- function(w, Lw, Aw, U, V, lambda, psi, beta, nu, K) {
   ULmdUT <- crossprod(sqrt(lambda) * t(U))
@@ -97,11 +79,6 @@ joint.V_update <- function(...) {
 }
 
 
-normalized_laplacian.U_update <- function(M, Theta, beta, k) {
-  return(eigvec_sym(M / beta + Theta)[, (k+1):ncol(Theta)])
-}
-
-
 laplacian.lambda_update <- function(lb, ub, beta, U, Lw, k) {
   q <- ncol(Lw) - k
   d <- diag(t(U) %*% Lw %*% U)
@@ -129,12 +106,6 @@ laplacian.lambda_update <- function(lb, ub, beta, U, Lw, k) {
     stop("eigenvalues are not in increasing order,
           consider increasing the value of beta")
   }
-}
-
-
-normalized_laplacian.lambda_update <- function(lb, beta, U, Theta, M, k) {
-  laplacian.lambda_update(lb = lb, ub = 2, beta = beta, U = U,
-                          Lw = M / beta + Theta, k = k)
 }
 
 

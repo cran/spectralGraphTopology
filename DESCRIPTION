@@ -1,6 +1,7 @@
 Package: spectralGraphTopology
 Title: Learning Graphs from Data via Spectral Constraints
-Version: 0.1.0
+Version: 0.1.1
+Date: 2019-05-31
 Description: Block coordinate descent estimators to learn k-component, bipartite,
     and k-component bipartite graphs from data by imposing spectral constraints
     on the eigenvalues and eigenvectors of the Laplacian and adjacency matrices.
@@ -28,10 +29,10 @@ RoxygenNote: 6.1.1
 Suggests: bookdown, knitr, prettydoc, rmarkdown, R.rsp, testthat,
         patrick, corrplot, igraph, kernlab, pals, clusterSim, viridis,
         quadprog, matrixcalc, CVXR
-VignetteBuilder: bookdown, knitr, prettydoc, rmarkdown, R.rsp
+VignetteBuilder: knitr, rmarkdown, R.rsp
 NeedsCompilation: yes
-Packaged: 2019-05-04 11:46:48 UTC; jvmirca
+Packaged: 2019-06-03 12:40:01 UTC; jvmirca
 Author: Ze Vinicius [cre, aut],
   Daniel P. Palomar [aut]
 Repository: CRAN
-Date/Publication: 2019-05-08 10:30:03 UTC
+Date/Publication: 2019-06-03 13:10:07 UTC
