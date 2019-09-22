@@ -62,9 +62,6 @@ E(net)$color <- apply(as.data.frame(get.edgelist(net)), 1,
                                         colors[V(net)$cluster[x[1]]], '#000000'))
 V(net)$color <- c(colors[1], colors[2])[twomoon$clusters]
 # plot network
-gr = .5 * (1 + sqrt(5))
-setEPS()
-postscript("twomoon.ps", family = "Times", height = 5, width = gr * 3.5)
 plot(net, layout = twomoon$data, vertex.label = NA, vertex.size = 3)
 }
 \references{

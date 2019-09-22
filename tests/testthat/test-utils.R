@@ -10,16 +10,7 @@ test_that("consistency of blockDiag function", {
   L2 <- matrix(2, N2, N2)
   L <- rbind(cbind(L1, matrix(0, N1, N2)),
              cbind(matrix(0, N2, N1), L2))
-  expect_that(all(L == block_diag(L1, L2)), is_true())
-})
-
-
-test_that("blockDiag throws an exception when shape is not square", {
-  N1 <- sample(1:10, 1)
-  N2 <- N1 + 1
-  L2 <- matrix(2, N1, N2)
-  expect_error(block_diag(matrix(-1, N1, N1),
-                          matrix(-1, N1, N2)), "matrix is not square")
+  expect_true(all(L == block_diag(L1, L2)))
 })
 
 
@@ -30,5 +21,5 @@ test_that("upper_view_vec works", {
                     -2, -4, 12, -6,
                     -3, -5, -6, 14))
   v <- upper_view_vec(M)
-  expect_that(all(v == - a * c(1:6)), is_true())
+  expect_true(all(v == - a * c(1:6)))
 })
