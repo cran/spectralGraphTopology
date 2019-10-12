@@ -1,15 +1,19 @@
 Package: spectralGraphTopology
 Title: Learning Graphs from Data via Spectral Constraints
-Version: 0.1.2
-Date: 2019-09-23
-Description: Block coordinate descent estimators to learn k-component, bipartite,
-    and k-component bipartite graphs from data by imposing spectral constraints
-    on the eigenvalues and eigenvectors of the Laplacian and adjacency matrices.
-    Those estimators leverages spectral properties of the graphical models as a
-    prior information, which turn out to play key roles in unsupervised machine
-    learning tasks such as clustering and community detection.  This package is
-    based on the paper "A Unified Framework for Structured Graph Learning via
-    Spectral Constraints" by S. Kumar et al (2019) <arXiv:1904.09792>.
+Version: 0.2.0
+Date: 2019-10-08
+Description: In the era of big data and hyperconnectivity, learning
+    high-dimensional structures such as graphs from data has become a prominent
+    task in machine learning and has found applications in many fields such as
+    finance, health care, and networks. 'spectralGraphTopology' is an open source,
+    documented, and well-tested R package for learning graphs from data. It
+    provides implementations of state of the art algorithms such as Combinatorial
+    Graph Laplacian Learning (CGL), Spectral Graph Learning (SGL), Graph Estimation
+    based on Majorization-Minimization (GLE-MM), and Graph Estimation based on
+    Alternating Direction Method of Multipliers (GLE-ADMM). In addition, graph
+    learning has been widely employed for clustering, where specific algorithms
+    are available in the literature. To this end, we provide an implementation of
+    the Constrained Laplacian Rank (CLR) algorithm.
 Authors@R: c(
   person("Ze", "Vinicius", role = c("cre", "aut"), email = "jvmirca@gmail.com"),
   person(c("Daniel", "P."), "Palomar", role = "aut", email = "daniel.p.palomar@gmail.com")
@@ -28,11 +32,11 @@ Imports: Rcpp, MASS, Matrix, progress, rlist
 RoxygenNote: 6.1.1
 Suggests: bookdown, knitr, prettydoc, rmarkdown, R.rsp, testthat,
         patrick, corrplot, igraph, kernlab, pals, clusterSim, viridis,
-        quadprog, matrixcalc, CVXR
+        quadprog, matrixcalc
 VignetteBuilder: knitr, rmarkdown, R.rsp
 NeedsCompilation: yes
-Packaged: 2019-09-22 16:57:37 UTC; mirca
+Packaged: 2019-10-10 15:50:11 UTC; mirca
 Author: Ze Vinicius [cre, aut],
   Daniel P. Palomar [aut]
 Repository: CRAN
-Date/Publication: 2019-09-22 21:50:02 UTC
+Date/Publication: 2019-10-12 08:00:03 UTC

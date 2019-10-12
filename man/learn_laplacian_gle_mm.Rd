@@ -4,22 +4,19 @@
 \alias{learn_laplacian_gle_mm}
 \title{Learn the weighted Laplacian matrix of a graph using the MM method}
 \usage{
-learn_laplacian_gle_mm(S, A, alpha = 0, maxiter = 5000,
-  reltol = 1e-04, abstol = 1e-04, record_objective = FALSE,
-  verbose = TRUE)
+learn_laplacian_gle_mm(S, A_mask = NULL, alpha = 0, maxiter = 10000,
+  reltol = 1e-05, record_objective = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{S}{a pxp sample covariance/correlation matrix}
 
-\item{A}{the binary adjacency matrix of the graph}
+\item{A_mask}{the binary adjacency matrix of the graph}
 
 \item{alpha}{L1 regularization hyperparameter}
 
 \item{maxiter}{the maximum number of iterations}
 
 \item{reltol}{relative tolerance on the weight vector w}
-
-\item{abstol}{absolute tolerance on the weight vector w}
 
 \item{record_objective}{whether or not to record the objective function. Default is FALSE}
 
