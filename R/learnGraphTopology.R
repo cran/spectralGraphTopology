@@ -19,13 +19,14 @@
 #'        w0 < 0
 #' @param lb lower bound for the eigenvalues of the Laplacian matrix
 #' @param ub upper bound for the eigenvalues of the Laplacian matrix
-#' @param alpha L1 regularization hyperparameter
+#' @param alpha reweighted l1-norm regularization hyperparameter
 #' @param beta regularization hyperparameter for the term ||L(w) - U Lambda U'||^2_F
 #' @param beta_max maximum allowed value for beta
 #' @param fix_beta whether or not to fix the value of beta. In case this parameter
 #'        is set to false, then beta will increase (decrease) depending whether the number of
 #'        zero eigenvalues is lesser (greater) than k
 #' @param rho how much to increase (decrease) beta in case fix_beta = FALSE
+#' @param eps small positive constant
 #' @param maxiter the maximum number of iterations
 #' @param abstol absolute tolerance on the weight vector w
 #' @param reltol relative tolerance on the weight vector w
@@ -36,8 +37,8 @@
 #' @param verbose whether to output a progress bar showing the evolution of the
 #'        iterations
 #' @return A list containing possibly the following elements:
-#' \item{\code{Laplacian}}{the estimated Laplacian Matrix}
-#' \item{\code{Adjacency}}{the estimated Adjacency Matrix}
+#' \item{\code{laplacian}}{the estimated Laplacian Matrix}
+#' \item{\code{adjacency}}{the estimated Adjacency Matrix}
 #' \item{\code{w}}{the estimated weight vector}
 #' \item{\code{lambda}}{optimization variable accounting for the eigenvalues of the Laplacian matrix}
 #' \item{\code{U}}{eigenvectors of the estimated Laplacian matrix}
@@ -45,12 +46,13 @@
 #' \item{\code{beta_seq}}{sequence of values taken by beta in case fix_beta = FALSE}
 #' \item{\code{convergence}}{boolean flag to indicate whether or not the optimization converged}
 #' \item{\code{obj_fun}}{values of the objective function at every iteration in case record_objective = TRUE}
-#' \item{\code{loglike}}{values of the negative loglikelihood at every iteration in case record_objective = TRUE}
+#' \item{\code{negloglike}}{values of the negative loglikelihood at every iteration in case record_objective = TRUE}
 #' \item{\code{w_seq}}{sequence of weight vectors at every iteration in case record_weights = TRUE}
 #' @author Ze Vinicius and Daniel Palomar
-#' @references S. Kumar, J. Ying, J. V. de Miranda Cardoso, D. P. Palomar. A unified
-#'             framework for structured graph learning via spectral constraints (2019).
-#'             https://arxiv.org/pdf/1904.09792.pdf
+#' @references S. Kumar, J. Ying, J. V. M. Cardoso, D. P. Palomar. A unified
+#'             framework for structured graph learning via spectral constraints.
+#'             Journal of Machine Learning Research, 2020.
+#'             http://jmlr.org/papers/v21/19-276.html
 #' @examples
 #' # design true Laplacian
 #' Laplacian <- rbind(c(1, -1, 0, 0),
@@ -62,11 +64,11 @@
 #' Y <- MASS::mvrnorm(n * 500, rep(0, n), MASS::ginv(Laplacian))
 #' # estimate graph on the basis of sampled data
 #' graph <- learn_k_component_graph(cov(Y), k = 2, beta = 10)
-#' graph$Laplacian
+#' graph$laplacian
 
 #' @export
 learn_k_component_graph <- function(S, is_data_matrix = FALSE, k = 1, w0 = "naive", lb = 0, ub = 1e4, alpha = 0,
-                                    beta = 1e4, beta_max = 1e6, fix_beta = TRUE, rho = 1e-2, m = 7,
+                                    beta = 1e4, beta_max = 1e6, fix_beta = TRUE, rho = 1e-2, m = 7, eps = 1e-4,
                                     maxiter = 1e4, abstol = 1e-6, reltol = 1e-4, eigtol = 1e-9,
                                     record_objective = FALSE, record_weights = FALSE, verbose = TRUE) {
   if (is_data_matrix || ncol(S) != nrow(S)) {
@@ -78,9 +80,6 @@ learn_k_component_graph <- function(S, is_data_matrix = FALSE, k = 1, w0 = "naiv
   }
   # number of nodes
   n <- nrow(S)
-  # l1-norm penalty factor
-  H <- alpha * (2 * diag(n) - matrix(1, n, n))
-  K <- S + H
   # find an appropriate inital guess
   if (is_data_matrix)
     Sinv <- L
@@ -90,12 +89,16 @@ learn_k_component_graph <- function(S, is_data_matrix = FALSE, k = 1, w0 = "naiv
   w0 <- w_init(w0, Sinv)
   # compute quantities on the initial guess
   Lw0 <- L(w0)
+  # l1-norm penalty factor
+  # H <- alpha * (2 * diag(n) - matrix(1, n, n))
+  H <- alpha * (diag(n) - matrix(1, n, n))
+  K <- S + H
   U0 <- laplacian.U_update(Lw = Lw0, k = k)
   lambda0 <- laplacian.lambda_update(lb = lb, ub = ub, beta = beta, U = U0,
                                      Lw = Lw0, k = k)
   # save objective function value at initial guess
   if (record_objective) {
-    ll0 <- laplacian.likelihood(Lw = Lw0, lambda = lambda0, K = K)
+    ll0 <- laplacian.negloglikelihood(Lw = Lw0, lambda = lambda0, K = K)
     fun0 <- ll0 + laplacian.prior(beta = beta, Lw = Lw0, lambda = lambda0, U = U0)
     fun_seq <- c(fun0)
     ll_seq <- c(ll0)
@@ -117,7 +120,7 @@ learn_k_component_graph <- function(S, is_data_matrix = FALSE, k = 1, w0 = "naiv
                                       Lw = Lw, k = k)
     # compute negloglikelihood and objective function values
     if (record_objective) {
-      ll <- laplacian.likelihood(Lw = Lw, lambda = lambda, K = K)
+      ll <- laplacian.negloglikelihood(Lw = Lw, lambda = lambda, K = K)
       fun <- ll + laplacian.prior(beta = beta, Lw = Lw, lambda = lambda, U = U)
       ll_seq <- c(ll_seq, ll)
       fun_seq <- c(fun_seq, fun)
@@ -150,15 +153,16 @@ learn_k_component_graph <- function(S, is_data_matrix = FALSE, k = 1, w0 = "naiv
     U0 <- U
     lambda0 <- lambda
     Lw0 <- Lw
+    K <- S + H / (-Lw + eps)
   }
   # compute the adjancency matrix
   Aw <- A(w)
-  results <- list(Laplacian = Lw, Adjacency = Aw, w = w, lambda = lambda, U = U,
+  results <- list(laplacian = Lw, adjacency = Aw, w = w, lambda = lambda, U = U,
                   elapsed_time = time_seq, convergence = has_w_converged,
                   beta_seq = beta_seq)
   if (record_objective) {
     results$obj_fun <- fun_seq
-    results$loglike <- ll_seq
+    results$negloglike <- ll_seq
   }
   if (record_weights)
     results$w_seq <- w_seq
@@ -194,7 +198,7 @@ learn_cospectral_graph <- function(S, lambda, k = 1, is_data_matrix = FALSE, w0 
   U0 <- laplacian.U_update(Lw = Lw0, k = k)
   # save objective function value at initial guess
   if (record_objective) {
-    ll0 <- laplacian.likelihood(Lw = Lw0, lambda = lambda, K = K)
+    ll0 <- laplacian.negloglikelihood(Lw = Lw0, lambda = lambda, K = K)
     fun0 <- ll0 + laplacian.prior(beta = beta, Lw = Lw0, lambda = lambda, U = U0)
     fun_seq <- c(fun0)
     ll_seq <- c(ll0)
@@ -214,7 +218,7 @@ learn_cospectral_graph <- function(S, lambda, k = 1, is_data_matrix = FALSE, w0 
     U <- laplacian.U_update(Lw = Lw, k = k)
     # compute negloglikelihood and objective function values
     if (record_objective) {
-      ll <- laplacian.likelihood(Lw = Lw, lambda = lambda, K = K)
+      ll <- laplacian.negloglikelihood(Lw = Lw, lambda = lambda, K = K)
       fun <- ll + laplacian.prior(beta = beta, Lw = Lw, lambda = lambda, U = U)
       ll_seq <- c(ll_seq, ll)
       fun_seq <- c(fun_seq, fun)
@@ -249,12 +253,12 @@ learn_cospectral_graph <- function(S, lambda, k = 1, is_data_matrix = FALSE, w0 
   }
   # compute the adjancency matrix
   Aw <- A(w)
-  results <- list(Laplacian = Lw, Adjacency = Aw, w = w, lambda = lambda, U = U,
+  results <- list(laplacian = Lw, adjacency = Aw, w = w, lambda = lambda, U = U,
                   elapsed_time = time_seq, convergence = has_w_converged,
                   beta_seq = beta_seq)
   if (record_objective) {
     results$obj_fun <- fun_seq
-    results$loglike <- ll_seq
+    results$negloglike <- ll_seq
   }
   if (record_weights)
     results$w_seq <- w_seq
@@ -289,20 +293,21 @@ learn_cospectral_graph <- function(S, lambda, k = 1, is_data_matrix = FALSE, w0 
 #' @param verbose whether to output a progress bar showing the evolution of the
 #'        iterations
 #' @return A list containing possibly the following elements:
-#' \item{\code{Laplacian}}{the estimated Laplacian Matrix}
-#' \item{\code{Adjacency}}{the estimated Adjacency Matrix}
+#' \item{\code{laplacian}}{the estimated Laplacian Matrix}
+#' \item{\code{adjacency}}{the estimated Adjacency Matrix}
 #' \item{\code{w}}{the estimated weight vector}
 #' \item{\code{psi}}{optimization variable accounting for the eigenvalues of the Adjacency matrix}
 #' \item{\code{V}}{eigenvectors of the estimated Adjacency matrix}
 #' \item{\code{elapsed_time}}{elapsed time recorded at every iteration}
 #' \item{\code{convergence}}{boolean flag to indicate whether or not the optimization converged}
 #' \item{\code{obj_fun}}{values of the objective function at every iteration in case record_objective = TRUE}
-#' \item{\code{loglike}}{values of the negative loglikelihood at every iteration in case record_objective = TRUE}
+#' \item{\code{negloglike}}{values of the negative loglikelihood at every iteration in case record_objective = TRUE}
 #' \item{\code{w_seq}}{sequence of weight vectors at every iteration in case record_weights = TRUE}
 #' @author Ze Vinicius and Daniel Palomar
-#' @references S. Kumar, J. Ying, J. V. de Miranda Cardoso, D. P. Palomar. A unified
-#'             framework for structured graph learning via spectral constraints (2019).
-#'             https://arxiv.org/pdf/1904.09792.pdf
+#' @references S. Kumar, J. Ying, J. V. M. Cardoso, D. P. Palomar. A unified
+#'             framework for structured graph learning via spectral constraints.
+#'             Journal of Machine Learning Research, 2020.
+#'             http://jmlr.org/papers/v21/19-276.html
 #' @examples
 #' library(spectralGraphTopology)
 #' library(igraph)
@@ -325,14 +330,14 @@ learn_cospectral_graph <- function(S, lambda, k = 1, is_data_matrix = FALSE, w0 
 #' S <- cov(Y)
 #' # estimate Adjacency matrix
 #' graph <- learn_bipartite_graph(S, z = 4, verbose = FALSE)
-#' graph$Adjacency[graph$Adjacency < 1e-3] <- 0
+#' graph$adjacency[graph$adjacency < 1e-3] <- 0
 #' # Plot Adjacency matrices: true, noisy, and estimated
 #' corrplot(Atrue / max(Atrue), is.corr = FALSE, method = "square",
 #'          addgrid.col = NA, tl.pos = "n", cl.cex = 1.25)
-#' corrplot(graph$Adjacency / max(graph$Adjacency), is.corr = FALSE,
+#' corrplot(graph$adjacency / max(graph$adjacency), is.corr = FALSE,
 #'          method = "square", addgrid.col = NA, tl.pos = "n", cl.cex = 1.25)
 #' # build networks
-#' estimated_bipartite <- graph_from_adjacency_matrix(graph$Adjacency,
+#' estimated_bipartite <- graph_from_adjacency_matrix(graph$adjacency,
 #'                                                    mode = "undirected",
 #'                                                    weighted = TRUE)
 #' V(estimated_bipartite)$type <- c(rep(0, 10), rep(1, 6))
@@ -377,7 +382,7 @@ learn_bipartite_graph <- function(S, is_data_matrix = FALSE, z = 0, nu = 1e4, al
   else
     Sinv <- MASS::ginv(S)
   # if w0 is either "naive" or "qp", compute it, else return w0
-  w0 <- w_init(w0, Sinv)
+  w0 <- w_init(w0, Sinv) + 1e-4
   Lips <- 1 / min(eigval_sym(L(w0) + J))
   # compute quantities on the initial guess
   Aw0 <- A(w0)
@@ -386,7 +391,7 @@ learn_bipartite_graph <- function(S, is_data_matrix = FALSE, z = 0, nu = 1e4, al
   Lips_seq <- c(Lips)
   time_seq <- c(0)
   start_time <- proc.time()[3]
-  ll0 <- bipartite.likelihood(Lw = L(w0), K = K, J = J)
+  ll0 <- bipartite.negloglikelihood(Lw = L(w0), K = K, J = J)
   fun0 <- ll0 + bipartite.prior(nu = nu, Aw = Aw0, psi = psi0, V = V0)
   fun_seq <- c(fun0)
   ll_seq <- c(ll0)
@@ -403,15 +408,22 @@ learn_bipartite_graph <- function(S, is_data_matrix = FALSE, z = 0, nu = 1e4, al
       w <- bipartite.w_update(w = w0, Aw = Aw0, V = V0, nu = nu, psi = psi0,
                               K = K, J = J, Lips = Lips)
       # compute the objective function at the updated value of w
+      Lw <- L(w)
       fun_t <- tryCatch({
-                   bipartite.obj_fun(Aw = A(w), Lw = L(w), V = V0, psi = psi0,
+                   bipartite.obj_fun(Aw = A(w), Lw = Lw, V = V0, psi = psi0,
                                      K = K, J = J, nu = nu)
                  }, warning = function(warn) return(Inf), error = function(err) return(Inf)
                )
+      chol_status <- try(chol(Lw + J), silent = TRUE)
+      chol_error <- ifelse(class(chol_status) == "try-error", TRUE, FALSE)
+      if (chol_error[1])
+        is_disconnected <- TRUE
+      else
+        is_disconnected <- FALSE
       # check if the previous value of the objective function is
       # smaller than the current one
       Lips_seq <- c(Lips_seq, Lips)
-      if (fun0 < fun_t)
+      if (fun0 < fun_t | is_disconnected)
         # in case it is in fact larger, then increase Lips and recompute w
         Lips <- 2 * Lips
       else {
@@ -427,7 +439,7 @@ learn_bipartite_graph <- function(S, is_data_matrix = FALSE, z = 0, nu = 1e4, al
     V <- bipartite.V_update(Aw = Aw, z = z)
     psi <- bipartite.psi_update(V = V, Aw = Aw)
     # compute negloglikelihood and objective function values
-    ll <- bipartite.likelihood(Lw = Lw, K = K, J = J)
+    ll <- bipartite.negloglikelihood(Lw = Lw, K = K, J = J)
     fun <- ll + bipartite.prior(nu = nu, Aw = Aw, psi = psi, V = V)
     # save measurements of time and objective functions
     time_seq <- c(time_seq, proc.time()[3] - start_time)
@@ -451,7 +463,7 @@ learn_bipartite_graph <- function(S, is_data_matrix = FALSE, z = 0, nu = 1e4, al
     psi0 <- psi
     Aw0 <- Aw
   }
-  results <- list(Laplacian = Lw, Adjacency = Aw, obj_fun = fun_seq, loglike = ll_seq, w = w,
+  results <- list(laplacian = Lw, adjacency = Aw, obj_fun = fun_seq, negloglike = ll_seq, w = w,
                   psi = psi, V = V, elapsed_time = time_seq, Lips = Lips,
                   Lips_seq = Lips_seq, convergence = (i < maxiter), nu = nu)
   if (record_weights)
@@ -501,8 +513,8 @@ learn_bipartite_graph <- function(S, is_data_matrix = FALSE, z = 0, nu = 1e4, al
 #'        iterations
 #'
 #' @return A list containing possibly the following elements:
-#' \item{\code{Laplacian}}{the estimated Laplacian Matrix}
-#' \item{\code{Adjacency}}{the estimated Adjacency Matrix}
+#' \item{\code{laplacian}}{the estimated Laplacian Matrix}
+#' \item{\code{adjacency}}{the estimated Adjacency Matrix}
 #' \item{\code{w}}{the estimated weight vector}
 #' \item{\code{psi}}{optimization variable accounting for the eigenvalues of the Adjacency matrix}
 #' \item{\code{lambda}}{optimization variable accounting for the eigenvalues of the Laplacian matrix}
@@ -512,12 +524,13 @@ learn_bipartite_graph <- function(S, is_data_matrix = FALSE, z = 0, nu = 1e4, al
 #' \item{\code{beta_seq}}{sequence of values taken by beta in case fix_beta = FALSE}
 #' \item{\code{convergence}}{boolean flag to indicate whether or not the optimization converged}
 #' \item{\code{obj_fun}}{values of the objective function at every iteration in case record_objective = TRUE}
-#' \item{\code{loglike}}{values of the negative loglikelihood at every iteration in case record_objective = TRUE}
+#' \item{\code{negloglike}}{values of the negative loglikelihood at every iteration in case record_objective = TRUE}
 #' \item{\code{w_seq}}{sequence of weight vectors at every iteration in case record_weights = TRUE}
 #' @author Ze Vinicius and Daniel Palomar
-#' @references S. Kumar, J. Ying, J. V. de Miranda Cardoso, D. P. Palomar. A unified
-#'             framework for structured graph learning via spectral constraints (2019).
-#'             https://arxiv.org/pdf/1904.09792.pdf
+#' @references S. Kumar, J. Ying, J. V. M. Cardoso, D. P. Palomar. A unified
+#'             framework for structured graph learning via spectral constraints.
+#'             Journal of Machine Learning Research, 2020.
+#'             http://jmlr.org/papers/v21/19-276.html
 #' @examples
 #' library(spectralGraphTopology)
 #' library(igraph)
@@ -531,14 +544,14 @@ learn_bipartite_graph <- function(S, is_data_matrix = FALSE, z = 0, nu = 1e4, al
 #' n <- ncol(Laplacian)
 #' Y <- MASS::mvrnorm(40 * n, rep(0, n), MASS::ginv(Laplacian))
 #' graph <- learn_bipartite_k_component_graph(cov(Y), k = 2, beta = 1e2, nu = 1e2, verbose = FALSE)
-#' graph$Adjacency[graph$Adjacency < 1e-2] <- 0
+#' graph$adjacency[graph$adjacency < 1e-2] <- 0
 #' # Plot Adjacency matrices: true, noisy, and estimated
 #' corrplot(Atrue / max(Atrue), is.corr = FALSE, method = "square", addgrid.col = NA, tl.pos = "n",
 #'          cl.cex = 1.25)
-#' corrplot(graph$Adjacency / max(graph$Adjacency), is.corr = FALSE, method = "square",
+#' corrplot(graph$adjacency / max(graph$adjacency), is.corr = FALSE, method = "square",
 #'          addgrid.col = NA, tl.pos = "n", cl.cex = 1.25)
 #' # Plot networks
-#' estimated_bipartite <- graph_from_adjacency_matrix(graph$Adjacency, mode = "undirected",
+#' estimated_bipartite <- graph_from_adjacency_matrix(graph$adjacency, mode = "undirected",
 #'                                                    weighted = TRUE)
 #' V(bipartite)$type <- rep(c(TRUE, FALSE), 4)
 #' V(estimated_bipartite)$type <- rep(c(TRUE, FALSE), 4)
@@ -595,7 +608,7 @@ learn_bipartite_k_component_graph <- function(S, is_data_matrix = FALSE, z = 0, 
   lambda0 <- joint.lambda_update(lb, ub, beta, U0, Lw0, k)
   if (record_objective) {
     # save objective function value at initial guess
-    ll0 <- joint.likelihood(Lw0, lambda0, K)
+    ll0 <- joint.negloglikelihood(Lw0, lambda0, K)
     fun0 <- ll0 + joint.prior(beta, nu, Lw0, Aw0, U0, V0, lambda0, psi0)
     fun_seq <- c(fun0)
     ll_seq <- c(ll0)
@@ -618,7 +631,7 @@ learn_bipartite_k_component_graph <- function(S, is_data_matrix = FALSE, z = 0, 
     psi <- joint.psi_update(V, Aw)
     time_seq <- c(time_seq, proc.time()[3] - start_time)
     if (record_objective) {
-      ll <- joint.likelihood(Lw, lambda, K)
+      ll <- joint.negloglikelihood(Lw, lambda, K)
       fun <- ll + joint.prior(beta, nu, Lw, Aw, U, V, lambda, psi)
       ll_seq <- c(ll_seq, ll)
       fun_seq <- c(fun_seq, fun)
@@ -652,12 +665,12 @@ learn_bipartite_k_component_graph <- function(S, is_data_matrix = FALSE, z = 0, 
     Lw0 <- Lw
     Aw0 <- Aw
   }
-  results <- list(Laplacian = Lw, Adjacency = Aw, w = w, psi = psi,
+  results <- list(laplacian = Lw, adjacency = Aw, w = w, psi = psi,
                   lambda = lambda, V = V, U = U, elapsed_time = time_seq,
                   beta_seq = beta_seq, convergence = has_w_converged)
   if (record_objective) {
     results$obj_fun <- fun_seq
-    results$loglike <- ll_seq
+    results$negloglike <- ll_seq
   }
   if (record_weights)
     results$w_seq <- w_seq

@@ -1,35 +1,28 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
 spectralGraphTopology
 =====================
 
-[![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/spectralGraphTopology)](https://cran.r-project.org/package=spectralGraphTopology)
+[![codecov](https://codecov.io/gh/mirca/spectralGraphTopology/branch/master/graph/badge.svg?token=0FlrfUz3pg)](https://app.codecov.io/gh/mirca/spectralGraphTopology)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/spectralGraphTopology)](https://cran.r-project.org/package=spectralGraphTopology)
 [![CRAN
 Downloads](https://cranlogs.r-pkg.org/badges/spectralGraphTopology)](https://cran.r-project.org/package=spectralGraphTopology)
 ![CRAN Downloads
 Total](https://cranlogs.r-pkg.org/badges/grand-total/spectralGraphTopology?color=brightgreen)
 [![Rcpp](https://img.shields.io/badge/powered%20by-Rcpp-orange.svg?style=flat)](http://www.rcpp.org/)
 
-[![codecov](https://codecov.io/gh/mirca/spectralGraphTopology/branch/master/graph/badge.svg)](https://codecov.io/gh/mirca/spectralGraphTopology)
-[![Travis-CI-Badge](https://travis-ci.org/mirca/spectralGraphTopology.svg?branch=master)](https://travis-ci.org/mirca/spectralGraphTopology)
-[![Build
-status](https://ci.appveyor.com/api/projects/status/vr62ddvc9xoabnwy?svg=true)](https://ci.appveyor.com/project/mirca/spectralgraphtopology-j05c9)
-[![Docker Build
-Status](https://img.shields.io/docker/cloud/build/mirca/spectralgraphtopology.svg)](https://hub.docker.com/r/mirca/spectralgraphtopology/)
-[![Build
-Status](https://dev.azure.com/jvmirca/spectralGraphTopology/_apis/build/status/mirca.spectralGraphTopology?branchName=master)](https://dev.azure.com/jvmirca/spectralGraphTopology/_build/latest?definitionId=1&branchName=master)
-
-<a href="https://mirca.github.io/spectralGraphTopology"><img style="float: right;" width="250" src="./man/figures//circles3_reduced.gif" align="right" /></a>
+<a href="https://mirca.github.io/spectralGraphTopology/"><img style="float: right;" width="250" src="./man/figures//circles3_reduced.gif" align="right" /></a>
 
 **spectralGraphTopology** provides estimators to learn k-component,
 bipartite, and k-component bipartite graphs from data by imposing
 spectral constraints on the eigenvalues and eigenvectors of the
-Laplacian and adjacency matrices. Those estimators leverages spectral
-properties of the graphical models as a prior information, which turn
-out to play key roles in unsupervised machine learning tasks such as
-community detection.
+Laplacian and adjacency matrices. Those estimators leverage spectral
+properties of the graphical models as a prior information which turn out
+to play key roles in unsupervised machine learning tasks such as
+clustering.
 
 **Documentation**:
-[**https://mirca.github.io/spectralGraphTopology**](https://mirca.github.io/spectralGraphTopology).
+[**https://mirca.github.io/spectralGraphTopology**](https://mirca.github.io/spectralGraphTopology/).
 
 Installation
 ------------
@@ -75,11 +68,11 @@ k <- 2  # number of components
 
 # estimate underlying graph
 S <- crossprod(t(twomoon$data))
-graph <- learn_k_component_graph(S, k = k, beta = .5, verbose = FALSE, abstol = 1e-3)
+graph <- learn_k_component_graph(S, k = k, beta = .25, verbose = FALSE, abstol = 1e-3)
 
 # plot
 # build network
-net <- igraph::graph_from_adjacency_matrix(graph$Adjacency, mode = "undirected", weighted = TRUE)
+net <- igraph::graph_from_adjacency_matrix(graph$adjacency, mode = "undirected", weighted = TRUE)
 # colorify nodes and edges
 colors <- c("#706FD3", "#FF5252")
 V(net)$cluster <- twomoon$clusters
@@ -106,42 +99,28 @@ If you made use of this software please consider citing:
 
 -   J. V. de Miranda Cardoso, D. P. Palomar (2019).
     spectralGraphTopology: Learning Graphs from Data via Spectral
-    Constraints. R package version 0.1.0.
-    <https://CRAN.R-project.org/package=spectralGraphTopology>
+    Constraints.
+    <a href="https://CRAN.R-project.org/package=spectralGraphTopology" class="uri">https://CRAN.R-project.org/package=spectralGraphTopology</a>
 
 -   S. Kumar, J. Ying, J. V. de Miranda Cardoso, and D. P. Palomar
-    (2019). A unified framework for structured graph learning via
-    spectral constraints. <https://arxiv.org/abs/1904.09792>
+    (2020). [A unified framework for structured graph learning via
+    spectral constraints](https://www.jmlr.org/papers/v21/19-276.html).
+    Journal of Machine Learning Research (21), pages 1-60.
+
+-   S. Kumar, J. Ying, J. V. de Miranda Cardoso, D. P. Palomar (2019).
+    [Structured graph learning via Laplacian spectral
+    constraints](https://papers.nips.cc/paper/9339-structured-graph-learning-via-laplacian-spectral-constraints.pdf).
+    Advances in Neural Information Processing Systems.
 
 In addition, consider citing the following bibliography according to
 their implementation:
 
-<table>
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 90%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th><strong>function</strong></th>
-<th><strong>reference</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>cluster_k_component_graph</code></td>
-<td>N., Feiping, W., Xiaoqian, J., Michael I., and H., Heng. (2016). <a href="https://dl.acm.org/citation.cfm?id=3016100.3016174">The Constrained Laplacian Rank Algorithm for Graph-based Clustering</a>, AAAI’16.</td>
-</tr>
-<tr class="even">
-<td><code>learn_laplacian_gle_mm</code></td>
-<td>Licheng Zhao, Yiwei Wang, Sandeep Kumar, and Daniel P. Palomar, <a href="https://palomar.home.ece.ust.hk/papers/2019/ZhaoWangKumarPalomar-TSP2019.pdf">Optimization Algorithms for Graph Laplacian Estimation via ADMM and MM</a>, IEEE Trans. on Signal Processing, vol. 67, no. 16, pp. 4231-4244, Aug. 2019</td>
-</tr>
-<tr class="odd">
-<td><code>learn_laplacian_gle_admm</code></td>
-<td>Licheng Zhao, Yiwei Wang, Sandeep Kumar, and Daniel P. Palomar, <a href="https://palomar.home.ece.ust.hk/papers/2019/ZhaoWangKumarPalomar-TSP2019.pdf">Optimization Algorithms for Graph Laplacian Estimation via ADMM and MM</a>, IEEE Trans. on Signal Processing, vol. 67, no. 16, pp. 4231-4244, Aug. 2019</td>
-</tr>
-</tbody>
-</table>
+| **function**                          | **reference**                                                                                                                                                                                                                                                                                       |
+|---------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `cluster_k_component_graph`           | N., Feiping, W., Xiaoqian, J., Michael I., and H., Heng. (2016). [The Constrained Laplacian Rank Algorithm for Graph-based Clustering](https://dl.acm.org/doi/10.5555/3016100.3016174), AAAI’16.                                                                                                    |
+| `learn_laplacian_gle_mm`              | Licheng Zhao, Yiwei Wang, Sandeep Kumar, and Daniel P. Palomar, [Optimization Algorithms for Graph Laplacian Estimation via ADMM and MM](https://palomar.home.ece.ust.hk/papers/2019/ZhaoWangKumarPalomar-TSP2019.pdf), IEEE Trans. on Signal Processing, vol. 67, no. 16, pp. 4231-4244, Aug. 2019 |
+| `learn_laplacian_gle_admm`            | Licheng Zhao, Yiwei Wang, Sandeep Kumar, and Daniel P. Palomar, [Optimization Algorithms for Graph Laplacian Estimation via ADMM and MM](https://palomar.home.ece.ust.hk/papers/2019/ZhaoWangKumarPalomar-TSP2019.pdf), IEEE Trans. on Signal Processing, vol. 67, no. 16, pp. 4231-4244, Aug. 2019 |
+| `learn_combinatorial_graph_laplacian` | H. E. Egilmez, E. Pavez and A. Ortega, [Graph learning from data under Laplacian and structural constraints](https://ieeexplore.ieee.org/document/7979524), Journal of Selected Topics in Signal Processing, vol. 11, no. 6, pp. 825-841, Sept. 2017                                                |
 
 Links
 -----
@@ -154,4 +133,9 @@ README file:
 [GitHub-readme](https://github.com/dppalomar/spectralGraphTopology/blob/master/README.md)
 
 Vignette:
-[GitHub-html-vignette](https://raw.githack.com/dppalomar/spectralGraphTopology/master/vignettes/SpectralGraphTopology.html)
+[GitHub-html-vignette](https://raw.githack.com/dppalomar/spectralGraphTopology/master/vignettes/SpectralGraphTopology.html),
+[CRAN-html-vignette](https://cran.r-project.org/package=spectralGraphTopology/vignettes/SpectralGraphTopology.html),
+[NeurIPS’19 Promotional
+slides](https://docs.google.com/viewer?url=https://github.com/dppalomar/spectralGraphTopology/raw/master/vignettes/NeurIPS19-promo-slides.pdf),
+[NeurIPS’19 Promotional
+video](https://www.youtube.com/watch?v=klAqFvyQx7k)

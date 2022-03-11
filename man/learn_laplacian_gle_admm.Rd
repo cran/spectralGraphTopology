@@ -4,9 +4,16 @@
 \alias{learn_laplacian_gle_admm}
 \title{Learn the weighted Laplacian matrix of a graph using the ADMM method}
 \usage{
-learn_laplacian_gle_admm(S, A_mask = NULL, alpha = 0, rho = 1,
-  maxiter = 10000, reltol = 1e-05, record_objective = FALSE,
-  verbose = TRUE)
+learn_laplacian_gle_admm(
+  S,
+  A_mask = NULL,
+  alpha = 0,
+  rho = 1,
+  maxiter = 10000,
+  reltol = 1e-05,
+  record_objective = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{S}{a pxp sample covariance/correlation matrix}

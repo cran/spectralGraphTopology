@@ -2,17 +2,17 @@
 % Please edit documentation in R/utils.R
 \name{relative_error}
 \alias{relative_error}
-\title{Computes the relative error between two matrices}
+\title{Computes the relative error between the true and estimated matrices}
 \usage{
-relative_error(A, B)
+relative_error(West, Wtrue)
 }
 \arguments{
-\item{A}{first matrix}
+\item{West}{estimated matrix}
 
-\item{B}{second matrix}
+\item{Wtrue}{true matrix}
 }
 \description{
-Computes the relative error between two matrices
+Computes the relative error between the true and estimated matrices
 }
 \examples{
 library(spectralGraphTopology)

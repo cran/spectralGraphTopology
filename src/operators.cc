@@ -2,7 +2,6 @@
 // [[Rcpp::depends(RcppEigen)]]
 using namespace Eigen;
 
-
 //' Computes the Laplacian linear operator which maps a vector of weights into
 //' a valid Laplacian matrix.
 //'
@@ -27,8 +26,8 @@ Eigen::MatrixXd L(const Eigen::VectorXd& w) {
     k -= j;
   }
 
-  Eigen::MatrixXd LwColSum = (Lw + Lw.transpose()).colwise().sum().asDiagonal();
-  Lw -= LwColSum;
+  Eigen::VectorXd LwColSum = (Lw + Lw.transpose()).colwise().sum();
+  Lw.diagonal() -= LwColSum;
   return Lw.selfadjointView<Upper>();
 }
 
@@ -146,11 +145,12 @@ Eigen::MatrixXd vec(const Eigen::MatrixXd& M) {
 }
 
 
-// Computes the Lstar operator.
-//
-// @param M matrix
-// @return w vector
-//
+//' Computes the Lstar operator.
+//'
+//' @param M matrix
+//' @return w vector
+//'
+//' @export
 // [[Rcpp::export]]
 Eigen::VectorXd Lstar(const Eigen::MatrixXd& M) {
   int N = M.cols();
@@ -171,11 +171,12 @@ Eigen::VectorXd Lstar(const Eigen::MatrixXd& M) {
 }
 
 
-// Computes the Astar operator.
-//
-// @param M matrix
-// @return w vector
-//
+//' Computes the Astar operator.
+//'
+//' @param M matrix
+//' @return w vector
+//'
+//' @export
 // [[Rcpp::export]]
 Eigen::VectorXd Astar(const Eigen::MatrixXd& M) {
   int N = M.cols();
@@ -218,9 +219,9 @@ Eigen::VectorXd Linv(const Eigen::MatrixXd& M) {
 }
 
 
-// Computes the inverse of the L operator.
+// Computes the inverse of the A operator.
 //
-// @param M Laplacian matrix
+// @param M Adjacency matrix
 // @return w the weight vector of the graph
 //
 // [[Rcpp::export]]
@@ -237,4 +238,42 @@ Eigen::VectorXd Ainv(const Eigen::MatrixXd& M) {
     }
   }
   return w;
+}
+
+
+//' Computes the degree operator from the vector of edge weights.
+//'
+//' @param w vector
+//' @return Dw vector
+//' @export
+// [[Rcpp::export]]
+Eigen::VectorXd D(const Eigen::VectorXd& w) {
+  return A(w).colwise().sum();
+}
+
+
+//' Computes the Dstar operator, i.e., the adjoint of the D operator.
+//'
+//' @param w vector
+//' @return Dstar(w) vector
+//'
+//' @export
+// [[Rcpp::export]]
+Eigen::VectorXd Dstar(const Eigen::VectorXd& w) {
+  return Lstar(w.asDiagonal());
+}
+
+
+// [[Rcpp::export]]
+Eigen::MatrixXd Dmat(const int n) {
+  Eigen::VectorXd e = Eigen::VectorXd::Zero(n);
+  Eigen::MatrixXd M(n, n);
+  e(0) = 1;
+  M.col(0) = Dstar(D(e));
+  for (int j = 1; j < n; ++j) {
+    e(j - 1) = 0;
+    e(j) = 1;
+    M.col(j) = Dstar(D(e));
+  }
+  return M;
 }

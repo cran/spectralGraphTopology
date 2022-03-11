@@ -7,9 +7,16 @@
 Learns a graph Laplacian matrix using the Combinatorial Graph Laplacian (CGL)
 algorithm proposed by Egilmez et. al. (2017)}
 \usage{
-learn_combinatorial_graph_laplacian(S, A_mask = NULL, alpha = 0,
-  reltol = 1e-05, max_cycle = 10000, regtype = 1,
-  record_objective = FALSE, verbose = TRUE)
+learn_combinatorial_graph_laplacian(
+  S,
+  A_mask = NULL,
+  alpha = 0,
+  reltol = 1e-05,
+  max_cycle = 10000,
+  regtype = 1,
+  record_objective = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{S}{sample covariance matrix}
@@ -33,7 +40,7 @@ at every iteration. Default is FALSE}
 }
 \value{
 A list containing possibly the following elements
-\item{\code{Laplacian}}{estimated Laplacian Matrix}
+\item{\code{laplacian}}{estimated Laplacian Matrix}
 \item{\code{elapsed_time}}{elapsed time recorded at every iteration}
 \item{\code{frod_norm}}{relative Frobenius norm between consecutive estimates of the Laplacian matrix}
 \item{\code{convergence}}{whether or not the algorithm has converged within the tolerance and max number of iterations}

@@ -7,12 +7,29 @@
 Jointly learns the Laplacian and Adjacency matrices of a graph on the basis
 of an observed data matrix}
 \usage{
-learn_bipartite_k_component_graph(S, is_data_matrix = FALSE, z = 0,
-  k = 1, w0 = "naive", m = 7, alpha = 0, beta = 10000,
-  rho = 0.01, fix_beta = TRUE, beta_max = 1e+06, nu = 10000,
-  lb = 0, ub = 10000, maxiter = 10000, abstol = 1e-06,
-  reltol = 1e-04, eigtol = 1e-09, record_weights = FALSE,
-  record_objective = FALSE, verbose = TRUE)
+learn_bipartite_k_component_graph(
+  S,
+  is_data_matrix = FALSE,
+  z = 0,
+  k = 1,
+  w0 = "naive",
+  m = 7,
+  alpha = 0,
+  beta = 10000,
+  rho = 0.01,
+  fix_beta = TRUE,
+  beta_max = 1e+06,
+  nu = 10000,
+  lb = 0,
+  ub = 10000,
+  maxiter = 10000,
+  abstol = 1e-06,
+  reltol = 1e-04,
+  eigtol = 1e-09,
+  record_weights = FALSE,
+  record_objective = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{S}{either a pxp sample covariance/correlation matrix, or a pxn data
@@ -72,8 +89,8 @@ iterations}
 }
 \value{
 A list containing possibly the following elements:
-\item{\code{Laplacian}}{the estimated Laplacian Matrix}
-\item{\code{Adjacency}}{the estimated Adjacency Matrix}
+\item{\code{laplacian}}{the estimated Laplacian Matrix}
+\item{\code{adjacency}}{the estimated Adjacency Matrix}
 \item{\code{w}}{the estimated weight vector}
 \item{\code{psi}}{optimization variable accounting for the eigenvalues of the Adjacency matrix}
 \item{\code{lambda}}{optimization variable accounting for the eigenvalues of the Laplacian matrix}
@@ -83,7 +100,7 @@ A list containing possibly the following elements:
 \item{\code{beta_seq}}{sequence of values taken by beta in case fix_beta = FALSE}
 \item{\code{convergence}}{boolean flag to indicate whether or not the optimization converged}
 \item{\code{obj_fun}}{values of the objective function at every iteration in case record_objective = TRUE}
-\item{\code{loglike}}{values of the negative loglikelihood at every iteration in case record_objective = TRUE}
+\item{\code{negloglike}}{values of the negative loglikelihood at every iteration in case record_objective = TRUE}
 \item{\code{w_seq}}{sequence of weight vectors at every iteration in case record_weights = TRUE}
 }
 \description{
@@ -105,14 +122,14 @@ bipartite <- graph_from_adjacency_matrix(Atrue, mode = "undirected", weighted = 
 n <- ncol(Laplacian)
 Y <- MASS::mvrnorm(40 * n, rep(0, n), MASS::ginv(Laplacian))
 graph <- learn_bipartite_k_component_graph(cov(Y), k = 2, beta = 1e2, nu = 1e2, verbose = FALSE)
-graph$Adjacency[graph$Adjacency < 1e-2] <- 0
+graph$adjacency[graph$adjacency < 1e-2] <- 0
 # Plot Adjacency matrices: true, noisy, and estimated
 corrplot(Atrue / max(Atrue), is.corr = FALSE, method = "square", addgrid.col = NA, tl.pos = "n",
          cl.cex = 1.25)
-corrplot(graph$Adjacency / max(graph$Adjacency), is.corr = FALSE, method = "square",
+corrplot(graph$adjacency / max(graph$adjacency), is.corr = FALSE, method = "square",
          addgrid.col = NA, tl.pos = "n", cl.cex = 1.25)
 # Plot networks
-estimated_bipartite <- graph_from_adjacency_matrix(graph$Adjacency, mode = "undirected",
+estimated_bipartite <- graph_from_adjacency_matrix(graph$adjacency, mode = "undirected",
                                                    weighted = TRUE)
 V(bipartite)$type <- rep(c(TRUE, FALSE), 4)
 V(estimated_bipartite)$type <- rep(c(TRUE, FALSE), 4)
@@ -136,9 +153,10 @@ plot(estimated_bipartite, layout = la,
      vertex.label = NA, vertex.size = 5)
 }
 \references{
-S. Kumar, J. Ying, J. V. de Miranda Cardoso, D. P. Palomar. A unified
-            framework for structured graph learning via spectral constraints (2019).
-            https://arxiv.org/pdf/1904.09792.pdf
+S. Kumar, J. Ying, J. V. M. Cardoso, D. P. Palomar. A unified
+            framework for structured graph learning via spectral constraints.
+            Journal of Machine Learning Research, 2020.
+            http://jmlr.org/papers/v21/19-276.html
 }
 \author{
 Ze Vinicius and Daniel Palomar

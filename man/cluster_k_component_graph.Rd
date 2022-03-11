@@ -7,8 +7,15 @@
 Cluster a k-component graph on the basis of an observed data matrix.
 Check out https://mirca.github.io/spectralGraphTopology for code examples.}
 \usage{
-cluster_k_component_graph(Y, k = 1, m = 5, lmd = 1, eigtol = 1e-09,
-  edgetol = 1e-06, maxiter = 1000)
+cluster_k_component_graph(
+  Y,
+  k = 1,
+  m = 5,
+  lmd = 1,
+  eigtol = 1e-09,
+  edgetol = 1e-06,
+  maxiter = 1000
+)
 }
 \arguments{
 \item{Y}{a pxn data matrix, where p is the number of nodes and n is the number of
@@ -29,8 +36,8 @@ to build an affinity matrix}
 }
 \value{
 A list containing the following elements:
-\item{\code{Laplacian}}{the estimated Laplacian Matrix}
-\item{\code{Adjacency}}{the estimated Adjacency Matrix}
+\item{\code{laplacian}}{the estimated Laplacian Matrix}
+\item{\code{adjacency}}{the estimated Adjacency Matrix}
 \item{\code{eigvals}}{the eigenvalues of the Laplacian Matrix}
 \item{\code{lmd_seq}}{sequence of lmd values at every iteration}
 \item{\code{elapsed_time}}{elapsed time at every iteration}
@@ -53,7 +60,7 @@ twomoon <- shapes.two.moon(N)
 # estimate underlying graph
 graph <- cluster_k_component_graph(twomoon$data, k = 2)
 # build network
-net <- graph_from_adjacency_matrix(graph$Adjacency, mode = "undirected", weighted = TRUE)
+net <- graph_from_adjacency_matrix(graph$adjacency, mode = "undirected", weighted = TRUE)
 # colorify nodes and edges
 colors <- c("#706FD3", "#FF5252", "#33D9B2")
 V(net)$cluster <- twomoon$clusters

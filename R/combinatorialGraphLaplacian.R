@@ -18,7 +18,7 @@
 #'        at every iteration. Default is FALSE
 #' @param verbose if TRUE, then a progress bar will be displayed in the console. Default is TRUE
 #' @return A list containing possibly the following elements
-#' \item{\code{Laplacian}}{estimated Laplacian Matrix}
+#' \item{\code{laplacian}}{estimated Laplacian Matrix}
 #' \item{\code{elapsed_time}}{elapsed time recorded at every iteration}
 #' \item{\code{frod_norm}}{relative Frobenius norm between consecutive estimates of the Laplacian matrix}
 #' \item{\code{convergence}}{whether or not the algorithm has converged within the tolerance and max number of iterations}
@@ -38,12 +38,12 @@ learn_combinatorial_graph_laplacian <- function(S, A_mask = NULL, alpha = 0, rel
   dc_var <- t(e_v) %*% S %*% e_v
   isshifting <- c(abs(dc_var) < reltol)
   if (isshifting) {
-      S <- S + 1 / n
+    S <- S + 1 / n
   }
   if (regtype == 1) {
-      H <- alpha * (2 * diag(n) - matrix(1, n, n))
+    H <- alpha * (diag(n) - matrix(1, n, n))
   } else if (regtype == 2) {
-      H <- alpha * (diag(n) - matrix(1, n, n))
+    H <- alpha * (2 * diag(n) - matrix(1, n, n))
   }
   K <- S + H
   O_init <- diag(1 / diag(K))
@@ -128,7 +128,8 @@ learn_combinatorial_graph_laplacian <- function(S, A_mask = NULL, alpha = 0, rel
   else has_converged = FALSE
   O <- O_best - (1 / n)
   C <- C_best - (1 / n)
-  results <- list(Laplacian = O, frob_norm = frob_norm,
+  Adjacency <- diag(diag(O)) - O
+  results <- list(laplacian = O, adjacency = Adjacency, frob_norm = frob_norm,
                   elapsed_time = time_seq, convergence = has_converged)
   if (record_objective)
     results$obj_fun <- fun

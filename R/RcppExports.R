@@ -13,6 +13,10 @@ inv_sympd <- function(M) {
     .Call('_spectralGraphTopology_inv_sympd', PACKAGE = 'spectralGraphTopology', M)
 }
 
+pinv <- function(M) {
+    .Call('_spectralGraphTopology_pinv', PACKAGE = 'spectralGraphTopology', M)
+}
+
 #' Computes the Laplacian linear operator which maps a vector of weights into
 #' a valid Laplacian matrix.
 #'
@@ -59,10 +63,22 @@ vec <- function(M) {
     .Call('_spectralGraphTopology_vec', PACKAGE = 'spectralGraphTopology', M)
 }
 
+#' Computes the Lstar operator.
+#'
+#' @param M matrix
+#' @return w vector
+#'
+#' @export
 Lstar <- function(M) {
     .Call('_spectralGraphTopology_Lstar', PACKAGE = 'spectralGraphTopology', M)
 }
 
+#' Computes the Astar operator.
+#'
+#' @param M matrix
+#' @return w vector
+#'
+#' @export
 Astar <- function(M) {
     .Call('_spectralGraphTopology_Astar', PACKAGE = 'spectralGraphTopology', M)
 }
@@ -75,6 +91,29 @@ Ainv <- function(M) {
     .Call('_spectralGraphTopology_Ainv', PACKAGE = 'spectralGraphTopology', M)
 }
 
+#' Computes the degree operator from the vector of edge weights.
+#'
+#' @param w vector
+#' @return Dw vector
+#' @export
+D <- function(w) {
+    .Call('_spectralGraphTopology_D', PACKAGE = 'spectralGraphTopology', w)
+}
+
+#' Computes the Dstar operator, i.e., the adjoint of the D operator.
+#'
+#' @param w vector
+#' @return Dstar(w) vector
+#'
+#' @export
+Dstar <- function(w) {
+    .Call('_spectralGraphTopology_Dstar', PACKAGE = 'spectralGraphTopology', w)
+}
+
+Dmat <- function(n) {
+    .Call('_spectralGraphTopology_Dmat', PACKAGE = 'spectralGraphTopology', n)
+}
+
 blockDiagCpp <- function(matrices) {
     .Call('_spectralGraphTopology_blockDiagCpp', PACKAGE = 'spectralGraphTopology', matrices)
 }
@@ -83,8 +122,8 @@ metrics <- function(Wtrue, West, eps) {
     .Call('_spectralGraphTopology_metrics', PACKAGE = 'spectralGraphTopology', Wtrue, West, eps)
 }
 
-pairwise_matrix_rownorm <- function(M) {
-    .Call('_spectralGraphTopology_pairwise_matrix_rownorm', PACKAGE = 'spectralGraphTopology', M)
+pairwise_matrix_rownorm2 <- function(M) {
+    .Call('_spectralGraphTopology_pairwise_matrix_rownorm2', PACKAGE = 'spectralGraphTopology', M)
 }
 
 upper_view_vec <- function(M) {

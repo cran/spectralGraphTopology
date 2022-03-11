@@ -1,7 +1,7 @@
 Package: spectralGraphTopology
 Title: Learning Graphs from Data via Spectral Constraints
-Version: 0.2.0
-Date: 2019-10-08
+Version: 0.2.2
+Date: 2022-03-10
 Description: In the era of big data and hyperconnectivity, learning
     high-dimensional structures such as graphs from data has become a prominent
     task in machine learning and has found applications in many fields such as
@@ -20,23 +20,22 @@ Authors@R: c(
   )
 Maintainer: Ze Vinicius <jvmirca@gmail.com>
 URL: https://github.com/dppalomar/spectralGraphTopology,
-        https://mirca.github.io/spectralGraphTopology,
+        https://mirca.github.io/spectralGraphTopology/,
         https://www.danielppalomar.com
 BugReports: https://github.com/dppalomar/spectralGraphTopology/issues
 Depends:
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
 LinkingTo: Rcpp, RcppArmadillo, RcppEigen
-Imports: Rcpp, MASS, Matrix, progress, rlist
-RoxygenNote: 6.1.1
-Suggests: bookdown, knitr, prettydoc, rmarkdown, R.rsp, testthat,
+Imports: Rcpp (>= 0.11.0), MASS, Matrix, progress, rlist
+RoxygenNote: 7.1.1
+Suggests: CVXR, bookdown, knitr, prettydoc, rmarkdown, R.rsp, testthat,
         patrick, corrplot, igraph, kernlab, pals, clusterSim, viridis,
         quadprog, matrixcalc
-VignetteBuilder: knitr, rmarkdown, R.rsp
+VignetteBuilder: CVXR, knitr, rmarkdown, R.rsp
 NeedsCompilation: yes
-Packaged: 2019-10-10 15:50:11 UTC; mirca
+Packaged: 2022-03-11 08:59:57 UTC; mirca
 Author: Ze Vinicius [cre, aut],
   Daniel P. Palomar [aut]
 Repository: CRAN
-Date/Publication: 2019-10-12 08:00:03 UTC
+Date/Publication: 2022-03-11 09:30:02 UTC

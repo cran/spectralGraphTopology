@@ -6,10 +6,20 @@
 
 Learns a bipartite graph on the basis of an observed data matrix}
 \usage{
-learn_bipartite_graph(S, is_data_matrix = FALSE, z = 0, nu = 10000,
-  alpha = 0, w0 = "naive", m = 7, maxiter = 10000,
-  abstol = 1e-06, reltol = 1e-04, record_weights = FALSE,
-  verbose = TRUE)
+learn_bipartite_graph(
+  S,
+  is_data_matrix = FALSE,
+  z = 0,
+  nu = 10000,
+  alpha = 0,
+  w0 = "naive",
+  m = 7,
+  maxiter = 10000,
+  abstol = 1e-06,
+  reltol = 1e-04,
+  record_weights = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{S}{either a pxp sample covariance/correlation matrix, or a pxn data
@@ -48,15 +58,15 @@ iterations}
 }
 \value{
 A list containing possibly the following elements:
-\item{\code{Laplacian}}{the estimated Laplacian Matrix}
-\item{\code{Adjacency}}{the estimated Adjacency Matrix}
+\item{\code{laplacian}}{the estimated Laplacian Matrix}
+\item{\code{adjacency}}{the estimated Adjacency Matrix}
 \item{\code{w}}{the estimated weight vector}
 \item{\code{psi}}{optimization variable accounting for the eigenvalues of the Adjacency matrix}
 \item{\code{V}}{eigenvectors of the estimated Adjacency matrix}
 \item{\code{elapsed_time}}{elapsed time recorded at every iteration}
 \item{\code{convergence}}{boolean flag to indicate whether or not the optimization converged}
 \item{\code{obj_fun}}{values of the objective function at every iteration in case record_objective = TRUE}
-\item{\code{loglike}}{values of the negative loglikelihood at every iteration in case record_objective = TRUE}
+\item{\code{negloglike}}{values of the negative loglikelihood at every iteration in case record_objective = TRUE}
 \item{\code{w_seq}}{sequence of weight vectors at every iteration in case record_weights = TRUE}
 }
 \description{
@@ -86,14 +96,14 @@ Y <- MASS::mvrnorm(100 * n, rep(0, n), Sigma = MASS::ginv(Ltrue))
 S <- cov(Y)
 # estimate Adjacency matrix
 graph <- learn_bipartite_graph(S, z = 4, verbose = FALSE)
-graph$Adjacency[graph$Adjacency < 1e-3] <- 0
+graph$adjacency[graph$adjacency < 1e-3] <- 0
 # Plot Adjacency matrices: true, noisy, and estimated
 corrplot(Atrue / max(Atrue), is.corr = FALSE, method = "square",
          addgrid.col = NA, tl.pos = "n", cl.cex = 1.25)
-corrplot(graph$Adjacency / max(graph$Adjacency), is.corr = FALSE,
+corrplot(graph$adjacency / max(graph$adjacency), is.corr = FALSE,
          method = "square", addgrid.col = NA, tl.pos = "n", cl.cex = 1.25)
 # build networks
-estimated_bipartite <- graph_from_adjacency_matrix(graph$Adjacency,
+estimated_bipartite <- graph_from_adjacency_matrix(graph$adjacency,
                                                    mode = "undirected",
                                                    weighted = TRUE)
 V(estimated_bipartite)$type <- c(rep(0, 10), rep(1, 6))
@@ -116,9 +126,10 @@ plot(estimated_bipartite, layout = la,
      vertex.label = NA, vertex.size = 5)
 }
 \references{
-S. Kumar, J. Ying, J. V. de Miranda Cardoso, D. P. Palomar. A unified
-            framework for structured graph learning via spectral constraints (2019).
-            https://arxiv.org/pdf/1904.09792.pdf
+S. Kumar, J. Ying, J. V. M. Cardoso, D. P. Palomar. A unified
+            framework for structured graph learning via spectral constraints.
+            Journal of Machine Learning Research, 2020.
+            http://jmlr.org/papers/v21/19-276.html
 }
 \author{
 Ze Vinicius and Daniel Palomar

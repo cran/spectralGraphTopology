@@ -3,6 +3,8 @@ library(testthat)
 library(patrick)
 library(spectralGraphTopology)
 
+set.seed(42)
+
 
 test_that("learn_k_component_graph with single component random graph", {
   w <- sample(1:10, 6)
@@ -11,8 +13,8 @@ test_that("learn_k_component_graph with single component random graph", {
   Y <- MASS::mvrnorm(n * 500, rep(0, n), MASS::ginv(Laplacian))
   res <- learn_k_component_graph(cov(Y), record_objective = TRUE, record_weights = TRUE)
   expect_true(res$convergence)
-  expect_true(relative_error(Laplacian, res$Laplacian) < 1e-1)
-  expect_true(metrics(Laplacian, res$Laplacian, 1e-1)[1] > .9)
+  expect_true(relative_error(Laplacian, res$laplacian) < 1e-1)
+  expect_true(metrics(Laplacian, res$laplacian, 1e-1)[1] > .9)
 })
 
 
@@ -24,8 +26,8 @@ with_parameters_test_that("we can recover a simple connected graph with the GLE-
     Y <- MASS::mvrnorm(n * 250, rep(0, n), MASS::ginv(Laplacian))
     res <- func(cov(Y), A_mask = A_mask, record_objective = TRUE, reltol = 1e-7)
     expect_true(res$convergence)
-    expect_true(relative_error(Laplacian, res$Laplacian) < 2e-1)
-    expect_true(fscore(Laplacian, res$Laplacian, 1e-1) > .8)
+    expect_true(relative_error(Laplacian, res$laplacian) < 2e-1)
+    expect_true(fscore(Laplacian, res$laplacian, 1e-1) > .8)
   },
   cases(list(func = learn_laplacian_gle_mm),
         list(func = learn_laplacian_gle_admm),
@@ -39,8 +41,8 @@ test_that("learn_k_component_graph with diamond graph", {
   Y <- MASS::mvrnorm(n * 1000, rep(0, n), MASS::ginv(Laplacian))
   res <- learn_k_component_graph(cov(Y))
   expect_true(res$convergence)
-  expect_true(relative_error(Laplacian, res$Laplacian) < 1e-1)
-  expect_true(metrics(Laplacian, res$Laplacian, 1e-1)[1] > .9)
+  expect_true(relative_error(Laplacian, res$laplacian) < 1e-1)
+  expect_true(metrics(Laplacian, res$laplacian, 1e-1)[1] > .9)
 })
 
 
@@ -51,8 +53,8 @@ test_that("learn_bipartite_graph converges with simple bipartite graph", {
   Y <- MASS::mvrnorm(n * 500, rep(0, n), MASS::ginv(L(w)))
   res <- learn_bipartite_graph(cov(Y), w0 = "qp", record_weights = TRUE)
   expect_true(res$convergence)
-  expect_true(relative_error(Adjacency, res$Adjacency) < 1e-1)
-  expect_true(metrics(Adjacency, res$Adjacency, 1e-1)[1] > .9)
+  expect_true(relative_error(Adjacency, res$adjacency) < 1e-1)
+  expect_true(metrics(Adjacency, res$adjacency, 1e-1)[1] > .9)
 })
 
 
@@ -63,8 +65,8 @@ test_that("learn_bipartite_k_component_graph can learn k-component bipartite gra
   Y <- MASS::mvrnorm(2 * n * 500, rep(0, n), MASS::ginv(Laplacian))
   graph <- learn_bipartite_k_component_graph(cov(Y), k = 2, record_objective = TRUE)
   expect_true(graph$convergence)
-  expect_true(relative_error(Laplacian, graph$Laplacian) < 1e-1)
-  expect_true(metrics(Laplacian, graph$Laplacian, 1e-1)[1] > .9)
+  expect_true(relative_error(Laplacian, graph$laplacian) < 2e-1)
+  expect_true(metrics(Laplacian, graph$laplacian, 1e-1)[1] > .8)
 })
 
 
@@ -75,8 +77,8 @@ test_that("learn_bipartite_k_component_graph converges with simple bipartite gra
   Y <- MASS::mvrnorm(n * 500, rep(0, n), MASS::ginv(L(w)))
   res <- learn_bipartite_k_component_graph(cov(Y), w0 = "qp")
   expect_true(res$convergence)
-  expect_true(relative_error(Adjacency, res$Adjacency) < 1.5e-1)
-  expect_true(metrics(Adjacency, res$Adjacency, 1e-1)[1] > .9)
+  expect_true(relative_error(Adjacency, res$adjacency) < 1.5e-1)
+  expect_true(metrics(Adjacency, res$adjacency, 1e-1)[1] > .9)
 })
 
 
@@ -89,8 +91,8 @@ test_that("learn_k_component_graph with two components", {
   Y <- MASS::mvrnorm(n * 500, rep(0, n), MASS::ginv(Laplacian))
   res <- learn_k_component_graph(cov(Y), k = 2, beta = 10)
   expect_true(res$convergence)
-  expect_true(relative_error(Laplacian, res$Laplacian) < 1e-1)
-  expect_true(metrics(Laplacian, res$Laplacian, 1e-1)[1] > .9)
+  expect_true(relative_error(Laplacian, res$laplacian) < 1e-1)
+  expect_true(metrics(Laplacian, res$laplacian, 1e-1)[1] > .9)
 })
 
 
@@ -119,8 +121,8 @@ test_that("learn_k_component_graph with two components graph #2", {
   Y <- MASS::mvrnorm(500 * (n1 + n2), rep(0, n1 + n2), MASS::ginv(Laplacian))
   res <- learn_k_component_graph(cov(Y), k = 2)
   expect_true(res$convergence)
-  expect_true(relative_error(Laplacian, res$Laplacian) < 2e-1)
-  expect_true(metrics(Laplacian, res$Laplacian, 1e-1)[1] > .8)
+  expect_true(relative_error(Laplacian, res$laplacian) < 2e-1)
+  expect_true(metrics(Laplacian, res$laplacian, 1e-1)[1] > .8)
 })
 
 
@@ -134,6 +136,6 @@ test_that("learn_bipartite_k_component_graph with two components graph #2", {
   Y <- MASS::mvrnorm(500 * (n1 + n2), rep(0, n1 + n2), MASS::ginv(Laplacian))
   res <- learn_bipartite_k_component_graph(cov(Y), k = 2, w0 = "qp", nu = 0, eigtol = 1e-5)
   expect_true(res$convergence)
-  expect_true(relative_error(Laplacian, res$Laplacian) < 2e-1)
-  expect_true(metrics(Laplacian, res$Laplacian, 1e-1)[1] > .8)
+  expect_true(relative_error(Laplacian, res$laplacian) < 2e-1)
+  expect_true(metrics(Laplacian, res$laplacian, 1e-1)[1] > .8)
 })

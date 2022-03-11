@@ -7,11 +7,28 @@
 Learns a k-component graph on the basis of an observed data matrix.
 Check out https://mirca.github.io/spectralGraphTopology for code examples.}
 \usage{
-learn_k_component_graph(S, is_data_matrix = FALSE, k = 1,
-  w0 = "naive", lb = 0, ub = 10000, alpha = 0, beta = 10000,
-  beta_max = 1e+06, fix_beta = TRUE, rho = 0.01, m = 7,
-  maxiter = 10000, abstol = 1e-06, reltol = 1e-04, eigtol = 1e-09,
-  record_objective = FALSE, record_weights = FALSE, verbose = TRUE)
+learn_k_component_graph(
+  S,
+  is_data_matrix = FALSE,
+  k = 1,
+  w0 = "naive",
+  lb = 0,
+  ub = 10000,
+  alpha = 0,
+  beta = 10000,
+  beta_max = 1e+06,
+  fix_beta = TRUE,
+  rho = 0.01,
+  m = 7,
+  eps = 1e-04,
+  maxiter = 10000,
+  abstol = 1e-06,
+  reltol = 1e-04,
+  eigtol = 1e-09,
+  record_objective = FALSE,
+  record_weights = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{S}{either a pxp sample covariance/correlation matrix, or a pxn data
@@ -33,7 +50,7 @@ w0 < 0}
 
 \item{ub}{upper bound for the eigenvalues of the Laplacian matrix}
 
-\item{alpha}{L1 regularization hyperparameter}
+\item{alpha}{reweighted l1-norm regularization hyperparameter}
 
 \item{beta}{regularization hyperparameter for the term ||L(w) - U Lambda U'||^2_F}
 
@@ -48,6 +65,8 @@ zero eigenvalues is lesser (greater) than k}
 \item{m}{in case is_data_matrix = TRUE, then we build an affinity matrix based
 on Nie et. al. 2017, where m is the maximum number of possible connections
 for a given node}
+
+\item{eps}{small positive constant}
 
 \item{maxiter}{the maximum number of iterations}
 
@@ -67,8 +86,8 @@ iterations}
 }
 \value{
 A list containing possibly the following elements:
-\item{\code{Laplacian}}{the estimated Laplacian Matrix}
-\item{\code{Adjacency}}{the estimated Adjacency Matrix}
+\item{\code{laplacian}}{the estimated Laplacian Matrix}
+\item{\code{adjacency}}{the estimated Adjacency Matrix}
 \item{\code{w}}{the estimated weight vector}
 \item{\code{lambda}}{optimization variable accounting for the eigenvalues of the Laplacian matrix}
 \item{\code{U}}{eigenvectors of the estimated Laplacian matrix}
@@ -76,7 +95,7 @@ A list containing possibly the following elements:
 \item{\code{beta_seq}}{sequence of values taken by beta in case fix_beta = FALSE}
 \item{\code{convergence}}{boolean flag to indicate whether or not the optimization converged}
 \item{\code{obj_fun}}{values of the objective function at every iteration in case record_objective = TRUE}
-\item{\code{loglike}}{values of the negative loglikelihood at every iteration in case record_objective = TRUE}
+\item{\code{negloglike}}{values of the negative loglikelihood at every iteration in case record_objective = TRUE}
 \item{\code{w_seq}}{sequence of weight vectors at every iteration in case record_weights = TRUE}
 }
 \description{
@@ -96,12 +115,13 @@ n <- ncol(Laplacian)
 Y <- MASS::mvrnorm(n * 500, rep(0, n), MASS::ginv(Laplacian))
 # estimate graph on the basis of sampled data
 graph <- learn_k_component_graph(cov(Y), k = 2, beta = 10)
-graph$Laplacian
+graph$laplacian
 }
 \references{
-S. Kumar, J. Ying, J. V. de Miranda Cardoso, D. P. Palomar. A unified
-            framework for structured graph learning via spectral constraints (2019).
-            https://arxiv.org/pdf/1904.09792.pdf
+S. Kumar, J. Ying, J. V. M. Cardoso, D. P. Palomar. A unified
+            framework for structured graph learning via spectral constraints.
+            Journal of Machine Learning Research, 2020.
+            http://jmlr.org/papers/v21/19-276.html
 }
 \author{
 Ze Vinicius and Daniel Palomar
