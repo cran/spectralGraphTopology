@@ -1,6 +1,6 @@
-38010b576ff57b1d05620a0cdce15930 *DESCRIPTION
+1c15e1779edd806b011efccac759b09d *DESCRIPTION
 b183a09fb1aa057d558345a7cfd45f3b *NAMESPACE
-e07c1be19454f8f77ee793620b9d4739 *NEWS.md
+0f1443a7880ac22af8f828167b4b402d *NEWS.md
 f1aadea1f4814e6144cd648b93a48510 *R/RcppExports.R
 a3237ccb146d84778b0b475a6ddf9327 *R/blockCoordinateDescent.R
 14d3cb88a168d5f14dbe69d6b3a0c896 *R/combinatorialGraphLaplacian.R
@@ -16,6 +16,7 @@ a6d3d88920303f4975cf4fa4c2a1398b *R/utils.R
 dae6b2c0138aa28ac7b0a2a3ec82ee5b *inst/CITATION
 8770c785fea5b237c3650ab3396b0617 *inst/doc/SpectralGraphTopology.html
 0ad3f03c8d4ec8259db98a946104cae6 *inst/doc/SpectralGraphTopology.html.asis
+57331367d125f7928d6332fba9ec9760 *inst/include/spectralGraphTopology_types.h
 61e588f790b2203b21729dcfbdd81cc8 *man/A.Rd
 c88921f7d6736470be974b3a5cf4476e *man/Astar.Rd
 192ba8b5f9a4e5326662661f14518694 *man/D.Rd
@@ -45,7 +46,7 @@ cb6c04bfedd7670e91cf34ddcf092960 *man/specificity.Rd
 3c69e1f7cf0acf18dac38b053023ea42 *man/spectralGraphTopology-package.Rd
 2a6f9e9e044a78154d3cfda5936d6f48 *src/Makevars
 2a6f9e9e044a78154d3cfda5936d6f48 *src/Makevars.win
-b1d05a318597a102977867d6a3177077 *src/RcppExports.cpp
+4d558680b3bf2eb00e52db372086053c *src/RcppExports.cpp
 1a0eeb4ab9893d3f3bdcd88ac8bf7815 *src/linalg.cc
 2dc893e355b41bb27cbe53609cf1dd29 *src/linalg.h
 437ab9bcf89f696ebc5129c2164ca18b *src/operators.cc
